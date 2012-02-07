@@ -55,11 +55,13 @@ namespace RedisIntegration
 
 			string sourceDirectory = string.Empty;
 			//sniff up the directory tree just in case something weird is going on
-			for (int i = 1; i > 6; ++i)
+			var asm = typeof(HostManager).Assembly;
+			for (int i = 1; i < 6; ++i)
 			{
 				string machineBits = (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86" && Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") == null) 
 					? "32bit" : "64bit";
-				var pathBits = new[] { Path.GetDirectoryName(typeof(HostManager).Assembly.Location) }.Concat(Enumerable.Repeat("..", i)).Concat(new[] { "tools", machineBits });
+				var pathBits = new[] { Path.GetDirectoryName(asm.Location) }.Concat(Enumerable.Repeat("..", i))
+					.Concat(new[] {"packages", "RedisIntegration." + asm.GetName().Version.ToString(4), "tools", machineBits });
 				sourceDirectory = Path.Combine(pathBits.ToArray());
 
 				if (Directory.Exists(sourceDirectory))
@@ -93,10 +95,10 @@ namespace RedisIntegration
 
 			var process = Process.Start(processInfo);
 
-			//totally clear out any junk we might have in there with a FLUSHALL
+			//totally clear out any junk we might have in there from old starts with a FLUSHALL
 			using (var client = new TcpClient(host, port))
 			{
-				http://redis.io/topics/protocol
+				//http://redis.io/topics/protocol
 				var flushAll = Encoding.ASCII.GetBytes("*1\r\n$8\r\nFLUSHALL\r\n");
 				client.GetStream().Write(flushAll, 0, flushAll.Length);
 			}			
