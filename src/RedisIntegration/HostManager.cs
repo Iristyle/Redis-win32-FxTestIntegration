@@ -18,34 +18,42 @@ namespace RedisIntegration
 		private static ConcurrentDictionary<Connection, HostProcessController> currentHosts 
 			= new ConcurrentDictionary<Connection, HostProcessController>();
 
-		/// <summary>	Gets the current host given a host / port.  The first time an instance fires up on this port, the FLUSHALL command is issued. </summary>
-		/// <remarks>	8/3/2011. </remarks>
-		/// <param name="host">   	The host. </param>
+		/// <summary>	Establishes a running server on the given port, with a visible Redis process window.  Issues a FLUSHALL command after starting up the first time. </summary>
 		/// <param name="port">   	The port (Redis default is 6379). </param>
-		/// <param name="visible">	true to show the window, false to hide. [ignored when a connection already exists] </param>
 		/// <returns>	A Connection instance describing the host and port connection information. </returns>
-		public static Connection Current(string host, int port, bool visible)
+		public static Connection RunInstanceWithVisibleWindow(int port)
 		{
-			var connection = new Connection(host, port);
+			return RunInstance(port, true);
+		}
+
+		/// <summary>	Establishes a running server on the given port, with a hidden Redis process window.  Issues a FLUSHALL command after starting up the first time. </summary>
+		/// <param name="port">   	The port (Redis default is 6379). </param>
+		/// <returns>	A Connection instance describing the host and port connection information. </returns>
+		public static Connection RunInstance(int port)
+		{
+			return RunInstance(port, false);
+		}
+
+		/// <summary>	Establishes a running server on default port 6379, with a visible Redis process window.  Issues a FLUSHALL command after starting up the first time. </summary>
+		/// <remarks>	The port defaults to 6379 (Redis default). </remarks>
+		/// <returns>	A Connection instance describing the host and port connection information. </returns>
+		public static Connection RunInstanceWithVisibleWindow()
+		{
+			return RunInstance(6379, true);
+		}
+
+		/// <summary>	Establishes a running server on default port 6379, with a hidden Redis process window.  Issues a FLUSHALL command after starting up the first time. </summary>
+		/// <returns>	A Connection instance describing the host and port connection information. </returns>
+		public static Connection RunInstance()
+		{
+			return RunInstance(6379, false);
+		}
+
+		private static Connection RunInstance(int port, bool visible)
+		{
+			var connection = new Connection("127.0.0.1", port);
 			currentHosts.GetOrAdd(connection, c => StartRedisInstance(c.Host, c.Port, visible));
 			return connection;
-		}
-
-		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. The first time an instance fires up on this port, the FLUSHALL command is issued.</summary>
-		/// <remarks>	The host defaults to "127.0.0.1", and the port to standard Redis 6379. </remarks>
-		/// <param name="visible">	true to show the window, false to hide. [ignored when a connection already exists] </param>
-		/// <returns>	A Connection instance describing the host and port connection information. </returns>
-		public static Connection Current(bool visible)
-		{
-			return Current("127.0.0.1", 6379, visible);
-		}
-
-		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. The first time an instance fires up on this port, the FLUSHALL command is issued.</summary>
-		/// <remarks>	The host defaults to "127.0.0.1", and the port to standard Redis 6379, with a non-visible window. </remarks>
-		/// <returns>	A Connection instance describing the host and port connection information. </returns>
-		public static Connection Current()
-		{
-			return Current("127.0.0.1", 6379, false);
 		}
 
 		[SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule", Justification = "The HostController now owns the Process and its finalizer disposes it")]
