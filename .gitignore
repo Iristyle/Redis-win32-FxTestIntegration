@@ -99,6 +99,7 @@ CVS/
 
 #NuGet
 packages/
+*.nupkg
 
 #Miscellaneous Files
 *.exe
