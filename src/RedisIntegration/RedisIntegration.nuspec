@@ -10,9 +10,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>Initial release</releaseNotes>
-    <frameworkAssemblies>
-      <frameworkAssembly assemblyName="System.Configuration" targetFramework="net40-client, net40" />
-    </frameworkAssemblies>
     <projectUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration</projectUrl>
     <licenseUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration/blob/master/tools/README</licenseUrl>
     <tags>Redis testing integration</tags>
@@ -25,7 +22,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\*.dll" target="lib" />
-    <file src="tools\**\*.*" />
+    <file src="tools\**\*" target="tools" />
   </files>
 </package>
