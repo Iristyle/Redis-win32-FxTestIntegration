@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Ethan Brown</authors>
+    <owners>$author$</owners>
+    <summary>Eases friction with integration testing Redis on Windows based build servers, or on Windows dev machines by supplying the Redis binary</summary>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration" targetFramework="net40-client, net40" />
+    </frameworkAssemblies>
+    <projectUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration</projectUrl>
+    <licenseUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration/blob/master/tools/README</licenseUrl>
+    <tags>Redis testing integration</tags>
+    <language>en-US</language>
+    <copyright>East Point Systems 2012 and contributors</copyright>
+    <dependencies>
+      <dependency id="ServiceStack.Common" version="3.4.3" />
+      <dependency id="ServiceStack.Redis" version="3.3.6" />
+      <dependency id="ServiceStack.Text" version="3.4.3" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\*.dll" target="lib" />
+    <file src="tools\**\*.*" />
+  </files>
+</package>
