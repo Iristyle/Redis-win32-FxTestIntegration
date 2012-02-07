@@ -34,7 +34,11 @@ namespace RedisIntegration
 		SecurityPermission(SecurityAction.Demand)]
 		~HostProcessController()
 		{
-			_process.Kill();
+			try
+			{
+				_process.Kill();
+			}
+			catch { }
 			try
 			{
 				File.Delete(DatabaseFilePath);
