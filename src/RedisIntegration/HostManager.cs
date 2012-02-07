@@ -5,8 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
-using ServiceStack.Redis;
 
 namespace RedisIntegration
 {
@@ -14,10 +15,10 @@ namespace RedisIntegration
 	/// <remarks>	8/3/2011. </remarks>
 	public static class HostManager
 	{
-		private static ConcurrentDictionary<Connection, HostController> currentHosts 
-			= new ConcurrentDictionary<Connection, HostController>();
+		private static ConcurrentDictionary<Connection, HostProcessController> currentHosts 
+			= new ConcurrentDictionary<Connection, HostProcessController>();
 
-		/// <summary>	Gets the current host given a host / port. </summary>
+		/// <summary>	Gets the current host given a host / port.  The first time an instance fires up on this port, the FLUSHALL command is issued. </summary>
 		/// <remarks>	8/3/2011. </remarks>
 		/// <param name="host">   	The host. </param>
 		/// <param name="port">   	The port (Redis default is 6379). </param>
@@ -30,7 +31,7 @@ namespace RedisIntegration
 			return connection;
 		}
 
-		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. </summary>
+		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. The first time an instance fires up on this port, the FLUSHALL command is issued.</summary>
 		/// <remarks>	The host defaults to "127.0.0.1", and the port to standard Redis 6379. </remarks>
 		/// <param name="visible">	true to show the window, false to hide. [ignored when a connection already exists] </param>
 		/// <returns>	A Connection instance describing the host and port connection information. </returns>
@@ -39,7 +40,7 @@ namespace RedisIntegration
 			return Current("127.0.0.1", 6379, visible);
 		}
 
-		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. </summary>
+		/// <summary>	Gets the current connection on host 127.0.0.1 and port 6379. The first time an instance fires up on this port, the FLUSHALL command is issued.</summary>
 		/// <remarks>	The host defaults to "127.0.0.1", and the port to standard Redis 6379, with a non-visible window. </remarks>
 		/// <returns>	A Connection instance describing the host and port connection information. </returns>
 		public static Connection Current()
@@ -48,7 +49,7 @@ namespace RedisIntegration
 		}
 
 		[SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule", Justification = "The HostController now owns the Process and its finalizer disposes it")]
-		private static HostController StartRedisInstance(string host, int port, bool visible)
+		private static HostProcessController StartRedisInstance(string host, int port, bool visible)
 		{
 			string tempPath = Path.GetTempPath();
 
@@ -92,14 +93,15 @@ namespace RedisIntegration
 
 			var process = Process.Start(processInfo);
 
-			//totally clear out any junk we might have in there
-			using (var clientManager = new BasicRedisClientManager(new string[] { String.Format(CultureInfo.InvariantCulture, "{0}:{1}", host, port) }))
-			using (var client = clientManager.GetClient())
+			//totally clear out any junk we might have in there with a FLUSHALL
+			using (var client = new TcpClient(host, port))
 			{
-				client.FlushAll();
-			}
+				http://redis.io/topics/protocol
+				var flushAll = Encoding.ASCII.GetBytes("*1\r\n$8\r\nFLUSHALL\r\n");
+				client.GetStream().Write(flushAll, 0, flushAll.Length);
+			}			
 
-			return new HostController(databaseFilePath, configPath, host, port, process);
+			return new HostProcessController(databaseFilePath, configPath, host, port, process);
 		}
 	}
 }

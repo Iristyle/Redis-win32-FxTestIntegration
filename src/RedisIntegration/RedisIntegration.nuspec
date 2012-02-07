@@ -15,11 +15,6 @@
     <tags>Redis testing integration</tags>
     <language>en-US</language>
     <copyright>East Point Systems 2012 and contributors</copyright>
-    <dependencies>
-      <dependency id="ServiceStack.Common" version="3.4.3" />
-      <dependency id="ServiceStack.Redis" version="3.3.6" />
-      <dependency id="ServiceStack.Text" version="3.4.3" />
-    </dependencies>
   </metadata>
   <files>
     <file src="tools\**\*" target="tools" />

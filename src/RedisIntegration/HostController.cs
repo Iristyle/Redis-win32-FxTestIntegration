@@ -6,9 +6,9 @@ using System.Security.Permissions;
 
 namespace RedisIntegration
 {
-	/// <summary>	A class that Redis host controller.  </summary>
+	/// <summary>	A class that disposes the Redis host process properly.  </summary>
 	/// <remarks>	8/3/2011. </remarks>
-	public class HostController
+	internal class HostProcessController
 	{
 		private Process _process;
 		
@@ -32,7 +32,7 @@ namespace RedisIntegration
 		/// <remarks>	8/3/2011. </remarks>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception type is unimportant for clean-up"), 
 		SecurityPermission(SecurityAction.Demand)]
-		~HostController()
+		~HostProcessController()
 		{
 			_process.Kill();
 			try
@@ -59,7 +59,7 @@ namespace RedisIntegration
 		/// <param name="host">			   	The host. </param>
 		/// <param name="port">			   	The port. </param>
 		/// <param name="process">		   	The process. </param>
-		public HostController(string databaseFilePath, string configFilePath, string host, int port, Process process)
+		public HostProcessController(string databaseFilePath, string configFilePath, string host, int port, Process process)
 		{
 			this.ConfigFilePath = configFilePath;
 			this.DatabaseFilePath = databaseFilePath;

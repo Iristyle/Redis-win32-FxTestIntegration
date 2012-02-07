@@ -18,7 +18,7 @@ namespace RedisIntegration
 		/// <remarks>	8/3/2011. </remarks>
 		/// <param name="port">	The port. </param>
 		/// <param name="host">	The host. </param>
-		public Connection(string host, int port)
+		internal Connection(string host, int port)
 		{
 			Port = port;
 			Host = host;
