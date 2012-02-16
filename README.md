@@ -1,3 +1,5 @@
+![Redis-Logo](http://redis.io/images/redis.png)
+
 # RedisIntegration 
 
 A very simple .NET based client library for starting up an ephemeral [Redis](http://redis.io/) server from code during a test.
