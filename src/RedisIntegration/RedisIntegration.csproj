@@ -99,21 +99,11 @@
     <None Include="tools\64bit\libhiredis.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="tools\64bit\redis-benchmark.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="tools\64bit\redis-check-aof.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="tools\64bit\redis-check-dump.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="tools\64bit\redis-cli.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="tools\64bit\redis-server.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="tools\64bit\redis-benchmark.exe" />
+    <None Include="tools\64bit\redis-check-aof.exe" />
+    <None Include="tools\64bit\redis-check-dump.exe" />
+    <None Include="tools\64bit\redis-cli.exe" />
+    <None Include="tools\64bit\redis-server.exe" />
     <None Include="tools\README-Windows.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

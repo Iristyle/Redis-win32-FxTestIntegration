@@ -66,8 +66,9 @@ namespace RedisIntegration
 			var asm = typeof(HostManager).Assembly;
 			for (int i = 1; i < 6; ++i)
 			{
-				string machineBits = (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86" && Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") == null) 
-					? "32bit" : "64bit";
+				string machineBits = "32bit";
+					//(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86" && Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") == null) 
+					//? "32bit" : "64bit";
 				var pathBits = new[] { Path.GetDirectoryName(asm.Location) }.Concat(Enumerable.Repeat("..", i))
 					.Concat(new[] {"packages", "RedisIntegration." + asm.GetName().Version.ToString(4), "tools", machineBits });
 				sourceDirectory = Path.Combine(pathBits.ToArray());
