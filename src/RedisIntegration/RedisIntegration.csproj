@@ -58,9 +58,9 @@
     <None Include="tools\00-RELEASENOTES">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="tools\32bit\redis.conf">
+    <EmbeddedResource Include="tools\32bit\redis.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
     <None Include="tools\64bit\redis.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -93,9 +93,9 @@
     <None Include="tools\32bit\redis-cli.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="tools\32bit\redis-server.exe">
+    <EmbeddedResource Include="tools\32bit\redis-server.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
     <None Include="tools\64bit\libhiredis.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
