@@ -8,6 +8,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace RedisIntegration
 {
@@ -59,42 +61,50 @@ namespace RedisIntegration
 		[SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule", Justification = "The HostController now owns the Process and its finalizer disposes it")]
 		private static HostProcessController StartRedisInstance(string host, int port, bool visible)
 		{
-			string tempPath = Path.GetTempPath();
-
-			string sourceDirectory = string.Empty;
-			//sniff up the directory tree just in case something weird is going on
 			var asm = typeof(HostManager).Assembly;
-			for (int i = 1; i < 6; ++i)
-			{
-				string machineBits = (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86" && Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") == null) 
-					? "32bit" : "64bit";
-				var pathBits = new[] { Path.GetDirectoryName(asm.Location) }.Concat(Enumerable.Repeat("..", i))
-					.Concat(new[] {"packages", "RedisIntegration." + asm.GetName().Version.ToString(4), "tools", machineBits });
-				sourceDirectory = Path.Combine(pathBits.ToArray());
+			
+			var redisServerFileName = "redis-server.exe";
+			var redisConfFileName = "redis.conf";
+			string targetFilePath = Path.Combine(Path.GetTempPath(), "RedisIntegration");
+			if(!Directory.Exists(targetFilePath))
+				Directory.CreateDirectory(targetFilePath);
 
-				if (Directory.Exists(sourceDirectory))
-					break;
+			var resNameServer = asm.GetManifestResourceNames().First(s => s.ToLower().Contains(redisServerFileName));
+			var resNameConf = asm.GetManifestResourceNames().First(s => s.ToLower().Contains(redisConfFileName));
+			
+			Dictionary<string, string> resToFile = new Dictionary<string,string>();
+			resToFile.Add(resNameServer, redisServerFileName);
+			resToFile.Add(resNameConf, redisConfFileName);
+
+			foreach(var res in new []{resNameServer, resNameConf})
+			{
+				using(var reader = new BinaryReader(asm.GetManifestResourceStream(res)))
+				{
+					File.WriteAllBytes(Path.Combine(targetFilePath, resToFile[res]), reader.ReadBytes((int)reader.BaseStream.Length));
+				}
 			}
 
-			//copy to our temp folder
-			foreach (var fileName in new [] { "redis-server.exe" })
-				File.Copy(Path.Combine(sourceDirectory, fileName), Path.Combine(tempPath, fileName), true);
+			var redisServerFullPath = Path.Combine(targetFilePath, redisServerFileName);
+			var redisConfFullPath = Path.Combine(targetFilePath, redisConfFileName);
 
-			string databaseFilePath = Path.GetTempFileName().Replace(".tmp", ".rdb");
+			if(!File.Exists(redisServerFullPath))
+				throw new FileNotFoundException(string.Format("redis-server.exe was not found at expected path: {0}", redisServerFullPath));
+			if(!File.Exists(redisConfFullPath))
+				throw new FileNotFoundException(string.Format("redis.conf was not found at expected path: {0}", redisConfFullPath));
 
-			string configuration = File.ReadAllText(Path.Combine(sourceDirectory, "redis.conf"));
+			string databaseFilePath = Path.Combine(targetFilePath, Path.GetFileName(Path.GetTempFileName().Replace(".tmp", ".rdb")));
+
+			string configuration = File.ReadAllText(redisConfFullPath);
 
 			//put in our specific environment info
 			configuration = Regex.Replace(configuration, "port 6379", String.Format(CultureInfo.InvariantCulture, "port {0}", port));
 			configuration = Regex.Replace(configuration, "databases 16", "databases 1");
-			configuration = Regex.Replace(configuration, @"dbfilename dump\.rdb", String.Format(CultureInfo.InvariantCulture, "dbfilename {0}", Path.
-			GetFileName(databaseFilePath)));
-			configuration = Regex.Replace(configuration, @"dir \./", String.Format(CultureInfo.InvariantCulture, "dir {0}", tempPath));
+			configuration = Regex.Replace(configuration, @"dbfilename dump\.rdb", String.Format(CultureInfo.InvariantCulture, "dbfilename {0}", Path.GetFileName(databaseFilePath)));
+			configuration = Regex.Replace(configuration, @"dir \./", String.Format(CultureInfo.InvariantCulture, "dir {0}", targetFilePath));
 
-			string configPath = Path.GetTempFileName().Replace(".tmp", ".conf");
-			File.WriteAllText(configPath, configuration);
+			File.WriteAllText(redisConfFullPath, configuration);
 
-			var processInfo = new ProcessStartInfo(Path.Combine(sourceDirectory, "redis-server.exe"), configPath) { WorkingDirectory = tempPath };
+			var processInfo = new ProcessStartInfo(redisServerFullPath, redisConfFullPath) { WorkingDirectory = targetFilePath };
 			if (!visible)
 			{
 				processInfo.UseShellExecute = false;
@@ -103,15 +113,24 @@ namespace RedisIntegration
 
 			var process = Process.Start(processInfo);
 
+			Thread.Sleep(100);
+
+			if(process.HasExited)
+			{
+				string message = string.Format("Redis-server.exe failed to start.  Exit code: {0}", process.ExitCode);
+
+				throw new Exception(message);
+			}
+
 			//totally clear out any junk we might have in there from old starts with a FLUSHALL
 			using (var client = new TcpClient(host, port))
 			{
 				//http://redis.io/topics/protocol
 				var flushAll = Encoding.ASCII.GetBytes("*1\r\n$8\r\nFLUSHALL\r\n");
 				client.GetStream().Write(flushAll, 0, flushAll.Length);
-			}			
+			}
 
-			return new HostProcessController(databaseFilePath, configPath, host, port, process);
+			return new HostProcessController(databaseFilePath, redisConfFullPath, host, port, process);
 		}
 	}
 }
