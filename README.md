@@ -22,7 +22,7 @@ There is also a ```RunInstanceWithVisibleWindow``` overload so that you can see 
 
 # What does it do?
 
-* Checks for the bitness of your processor, and launches the x86 or x64 binary as appropriate
+* Launches the x86 Redis server binary (as Microsoft does not provide an x64 binary)
 * Writes a new randomly named config file, setting the port, pointing to a %temp% db file, and setting number of dbs to 1
 * Creates an empty randomly named db file
 * Launches the server
@@ -30,11 +30,25 @@ There is also a ```RunInstanceWithVisibleWindow``` overload so that you can see 
 
 # Redis Version
 
-The current Windows binaries are based on Redis 2.4.5.
+The current Windows binaries are based on Redis 2.4.11.
+
+# Release Notes
+
+* 0.3.0.0
+  * Thanks to [derfsplat](https://github.com/derfsplat) for embedding the exe
+  as a resource in the compiled assembly.  This provides a more robust launch
+  mechanism which allows for starting Redis inside VS 2012 test runners, within
+  ASP.NET, or generally any other disk location.
+  * Upgraded to MS Open Tech Redis, based on 2.4.11 -- this build implements
+  copy on write on Windows.  This will be the 'official' Windows build.
+  * x64 support stripped (for now at least) - all tests use x86 Redis
 
 # Thanks
 
-Obviously this wouldn't be possible without the hard work of Antirez on the original [Redis](https://github.com/antirez/redis) and dmajkic on the [Win32 / Win64 port](https://github.com/dmajkic/redis/).  Redis is an absolutely fantastic piece of software.
+* Antirez for [Redis](https://github.com/antirez/redis) - obviously this
+wouldn't be possible without his hard work
+* dmajkic for the original [Win32 / Win64 port](https://github.com/dmajkic/redis/).
+* Microsoft Open Tech for their continue work on the Windows port
 
 # Warranties
 

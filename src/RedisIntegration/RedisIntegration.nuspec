@@ -9,7 +9,15 @@
     <summary>Eases friction with integration testing Redis on Windows based build servers, or on Windows dev machines by supplying the Redis binary</summary>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial release</releaseNotes>
+    <releaseNotes>
+      * More robust launching mechanism thats compatible with VS 2012 test runners,
+      ASP.NET, or generally any other disk location.
+      * Upgraded to MS Open Tech Redis, based on 2.4.11 -- this build implements
+      copy on write on Windows.  This will be the 'official' Windows build.
+      * x64 support stripped (for now at least) - all tests use x86 Redis
+      regardless of host platform
+    </releaseNotes>
+    <iconUrl>http://redis.io/images/redis.png</iconUrl>
     <projectUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration</projectUrl>
     <licenseUrl>https://github.com/EastPoint/Redis-win32-FxTestIntegration/blob/master/tools/README</licenseUrl>
     <tags>Redis testing integration</tags>
