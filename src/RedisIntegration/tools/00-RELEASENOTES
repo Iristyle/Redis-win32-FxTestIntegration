@@ -18,6 +18,78 @@ to modify your program in order to use Redis 2.4.
 CHANGELOG
 ---------
 
+What's new in Redis 2.4.11
+=========================
+
+UPGRADE URGENCY: moderate if you don't experience any of the fixed problems.
+
+* [BUGFIX] Fixed a problem with aeWait() implementation. May cause a crash
+           under non easy to replicate condiitons. See issue #267 on github.
+* [BUGFIX] SORT with GET/BY option fetching expiring keys fixed. Issue #460.
+* [BUGFIX] INFO field master_link_down_since_seconds initialized correctly.
+* [FEATURE] redis-cli back ported from Redis unstable. Now has support for
+            --bigkeys (to sample the DB for very large keys), --slave to
+            simulate a slave instance.
+
+What's new in Redis 2.4.10
+==========================
+
+UPGRADE URGENCY: High for users using replication with a DB identifier higher than 9, or chaining replication so that slaves are attached to other slaves. Low for all the other users.
+
+* [FEATURE] Redis --test-meory improved with new test testing addressing.
+* [BUGFIX] Fixed a memory leak: happens when replication is used with DB > 9.
+* [BUGFIX] Fixed a replication bug that happens in chained replicaiton when a slave is attached to a master that is later turned into a slave. Now the chained slave reconnection is properly forced.
+
+What's new in Redis 2.4.9
+=========================
+
+UPGRADE URGENCY: low. Mostly new features and minor bug fixing.
+
+* [FEATURE] Redis server is now able to test your memory for broken RAM.
+            Usage: ./redis-server --test-memory <megabytes>.
+* [FEATURE] redis-benchmark backported from unstable. Pipelining, run selected
+            tests, and a few more features.
+* [BUGFIX] utils/install_server.sh script now works on Redhat / Centos.
+* [BUGFIX] Minor fix to redis-cli (github issue #306).
+
+What's new in Redis 2.4.8
+=========================
+
+UPGRADE URGENCY: moderate if you don't experience any of the fixed problems.
+
+* [BUGFIX] Make install now uses cp -f to avoid 'text file busy' errors.
+* [BUGFIX] redis-check-aof is now large files safe also on 32 bit systems.
+* [BUGFIX] Issue #327 fixed: maxmemory and replication now work much better.
+* [BUGFIX] Now HINCRBY can detect overflows too. Fix for issue #330.
+* [BUGFIX] Fixed compilation with latest clang.
+* [BUGFIX] Fixed handling of empty sorted sets produced in RDB by
+           very old Redis versions (1.2.x).
+
+What's new in Redis 2.4.7
+=========================
+
+UPGRADE URGENCY: low/moderate if you don't experience any of the fixed problems.
+
+* [BUGFIX] Fixed false positive in issue #141 regression test.
+* [BUGFIX] Slave should not expire keys when loading an RDB after a SYNC.
+* [BUGFIX] Don't increment stats for key misses / hits when key is written.
+* [BUGFIX] sds.c library now don't allocate more than 1MB ahead.
+* 32 bit instances without a maxmemory set now get a default limit of 3.5GB with
+  maxmemory-policy set to noeviction.
+* Better crash report on crash (containing current client and command arguments).
+
+What's new in Redis 2.4.6
+=========================
+
+* [BUGFIX] Fixed issue #141 part 1: Possible protocol desyncs when clients send
+           wrong protocol is now fixed. (See issue 141 for more details)
+* [BUGFIX] Fixed issue #141 part 2: Connection of multiple slaves used to result
+           from time to time into corrupted protocol send to slaves connected
+           after the first one. (See issue 141 for more details)
+* [BUGFIX] Do not propagate DEBUG LOADAOF.
+* New INFO contains information such as ip/port/state for every conneced slave.
+* Show GCC version in INFO output.
+
 What's new in Redis 2.4.5
 =========================
 
@@ -124,86 +196,6 @@ What's new in Redis 2.3.9 (2.4 Release Candidate 6)
 * New maxmemory tests.
 
 What's new in Redis 2.3.8 (2.4 Release Candidate 5)
-==========================
-
-* The Slowlog feature was backported to Redis 2.2.
-* A number of fixes related blocking operations on lists when mixed with
-  AOF and Replication.
-* Fixed bad interactions between EXPIRE, EXPIREAT, and in general volatile
-  keys when AOF is enabled. More details in the Redis Google Group here:
-  http://groups.google.com/group/redis-db/browse_frm/thread/5a931fefb88b16d5?tvc=1
-* no more allocation stats info in INFO.
-* colorized make for 2.2 as well.
-* Fixed a problem with AOF when it is stopped via CONFIG SET appendonly no.
-* Warn the user enabling VM that VM is deprecated and discouraged.
-* prepareForShutdown() fixed for correctness.
-* Close the listening sockets on exit for faster restarts.
-
-What's new in Redis 2.2.11
-==========================
-
-* Solved a never reported but possibly critical bug in the AOF and RDB
-persistence, introduced with the new version of the iterator: In very rare
-circumstances the AOF (after rerwite) or the rdb file may contain the same
-key more than one time.
-
-What's new in Redis 2.2.10
-==========================
-
-* Fix for issue 566. It was possible for SETNX to behave in abnormal ways.
-* Work with make v3.80
-* redis-cli updated to the same version as the 2.4 branch. Now the
-  reconnection handling is better. You can prefix commands with a number
-  to execute the command the specified number of times. When using -r
-  in non interactive mode it is possible to set a delay between commands.
-* Better init script.
-
-What's new in Redis 2.2.9
-=========================
-
-Redis 2.2.9 is an important bugfix release:
-
-* A Slave used to rewrite the AOF log after a sync with the master, but the
-  rewrite was performed at the wrong time, causing inconsistencies in the
-  AOF file generated.
-* [LR]LPUSH replication in presence of BRPOPLPUSH was broken. Fixed.
-* Memory leak in BRPOPLPUSH fixed.
-* Pub/Sub bug resulting in random crashes fixed.
-
-What's new in Redis 2.2.8
-=========================
-
-* A new form of dict.c (hash table implementation) iterator that performs less
-  copy-on-write of pages, introduced in Redis 2.2.7, caused ZINTERSTORE,
-  ZUNIONSTORE, SINTER, SINTERSTORE commands to behave in the wrong way.
-  This bug is now fixed.
-* Print version info before running the test with 'make test'. This is mainly
-  useful for the Continuous Integration system we run.
-* Fix for DEBUG DIGEST, key may expire on lookup, producing the wrong result.
-* Replication with expire test modified to produce no or less false failures.
-* Fixed Z*STORE when dealing with intsets, regression test added.
-
-What's new in Redis 2.2.7
-=========================
-
-* Fixed bug #543-2 (the issue was reopened with a completely different report)
-  that caused Redis to randomly crash on list push performed against lists
-  with other clients blocked with BLPOP (or variants).
-
-What's new in Redis 2.2.6
-=========================
-
-* Fixed bug #543. If you saw Redis instances crashing on List operations
-  (only happening with a non-default max entry size ziplist setting in
-  redis.conf) it was almost certainly this problem.
-* Fixed a bug with replication where SLAVEOF NO ONE caused a slave to close the
-  connection with all its slaves.
-
-What's new in Redis 2.2.5
-=========================
-
-* Fixed a crash occurring when loading an AOF containing the SPOP command.
-
 ===================================================
 
 Compared to Redis 2.3.7 (RC4) there are the following changes:
