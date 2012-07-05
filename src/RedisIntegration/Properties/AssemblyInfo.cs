@@ -8,7 +8,7 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RedisIntegration")]
-[assembly: AssemblyDescription("Provides a simple .NET library and the win32 / win64 Redis binaries to ease local integration tests.")]
+[assembly: AssemblyDescription("Provides a simple .NET library and the MS Open Tech x86 Redis binaries to ease local integration tests.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("East Point Systems, Inc. http://www.eastpointsystems.com/")]
 [assembly: AssemblyProduct("RedisIntegration")]
