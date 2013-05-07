@@ -22,7 +22,7 @@ There is also a ```RunInstanceWithVisibleWindow``` overload so that you can see 
 
 # What does it do?
 
-* Launches the x86 Redis server binary (as Microsoft does not provide an x64 binary)
+* Launches the x86 Redis server binary
 * Writes a new randomly named config file, setting the port, pointing to a %temp% db file, and setting number of dbs to 1
 * Creates an empty randomly named db file
 * Launches the server
@@ -30,7 +30,7 @@ There is also a ```RunInstanceWithVisibleWindow``` overload so that you can see 
 
 # Redis Version
 
-The current Windows binaries are based on Redis 2.4.11.
+The current Windows binaries are based on Redis 2.6.12.
 
 # Release Notes
 
